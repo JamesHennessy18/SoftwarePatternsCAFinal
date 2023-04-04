@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>List products</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+    <style>
+	body {
+	background-image: url('Crypto.mp4');
+	background-size: cover;
+	}
+	</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">MarketSwipe</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" th:href="@{/home_page}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/listItems}">List Product</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/products}"> My Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/myAccount}"> My Account</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/crypto}"> Crypto Markets</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/chat}"> Messages</a>
+                </li>
+            </ul>
+
+        </div>
+        <li class="nav-item">
+            <div class="container text-center">
+                <form th:action="@{/logout}" method="post">
+                    <p style="color:green;">
+                        Welcome <b>[[${#request.userPrincipal.principal.fullName}]]</b>
+                    </p>
+                    <input type="submit" value="Sign Out" />
+                </form>
+            </div>
+        </li>
+    </div>
+
+</nav>
+<br>
+<br>
+<br>
+<br>
+<br>
+<center>
+    <h1 style="color:green">Welcome <b>[[${#request.userPrincipal.principal.fullName}]]</b></h1>
+    <h2 style="color:green">Live Crypto Markets</h2>
+    <br>
+    <br>
+
+
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/markets/cryptocurrencies/prices-all/" rel="noopener" target="_blank"><span class="blue-text">Crypto markets</span></a> by TradingView</div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
+  {
+  "width": "1800",
+  "height": "600",
+  "defaultColumn": "overview",
+  "screener_type": "crypto_mkt",
+  "displayCurrency": "USD",
+  "colorTheme": "light",
+  "locale": "en",
+  "isTransparent": true
+}
+  </script>
+    </div>
+    <!-- TradingView Widget END -->
+</center>
+</body>
+</html>

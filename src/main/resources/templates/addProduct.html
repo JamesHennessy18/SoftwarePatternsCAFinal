@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>List Users</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+</head>
+<body>
+<form th:action="@{/product/save}" th:object="${item}"
+      method="post" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto">
+    <input type="hidden" th:field="*{itemId}">
+    <div class="m-3">
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Product title: </label>
+            <div class="col-8">
+                <input type="text" th:field="*{title}" class="form-control" required />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Price: </label>
+            <div class="col-8">
+                <input type="text" th:field="*{price}" class="form-control"
+                       required minlength="0" maxlength="10"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-4 col-form-label">manufacturer: </label>
+            <div class="col-8">
+                <input type="text" th:field="*{manufacturer}" class="form-control"
+                       required minlength="2" maxlength="40"/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-4 col-form-label">Category: </label>
+            <div class="col-8">
+                <select name="category" th:field="*{category}" class="form-control">
+                    <option value="phone">phone</option>
+                    <option value="Camera">Camera</option>
+                    <option value="laptop">laptop</option>
+                    <option value="accessory">accessory</option>
+
+                </select>
+            </div>
+
+
+        </div>
+        <div class="form-group row">
+            <label class="col-4 col-form-label">image: </label>
+            <div class="col-8">
+                <input type="text" th:field="*{image}" class="form-control"
+                       required minlength="2" maxlength="40"/>
+            </div>
+        </div>
+
+
+
+
+        <div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
+</body>
+</html>

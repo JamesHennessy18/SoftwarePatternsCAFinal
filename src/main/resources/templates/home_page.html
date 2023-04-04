@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="ISO-8859-1">
+	<title>List Users</title>
+	<link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css" />
+	<script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+    function clearSearch() {
+        window.location = "[[@{/home_page}]]";
+    }
+</script>
+</head>
+<body>
+<div class="container text-center">
+	<div>
+		<form th:action="@{/logout}" method="post">
+			<p>
+				Welcome <b>[[${#request.userPrincipal.principal.fullName}]]</b>
+			</p>
+			<input type="submit" value="Sign Out" />
+		</form>
+	</div>
+	<div class="form-center">
+		<form th:action="@{/home_page}">
+			<input type="text" name="keyword" id="keyword" placeholder="Search for a Product..." size="25" th:value="${keyword}" required />
+			<button class="btn btn-outline-success" type="submit">Search</button>
+			<button class="btn btn-outline-success" type="submit" onclick="clearSearch()">Clear</button>
+		</form>
+	</div>
+
+	<div>
+		<table class="table table-striped table-bordered">
+			<thead class="thead-dark">
+			<tr>
+				<th>title</th>
+				<th>category</th>
+				<th>manufacturer</th>
+				<th>&#8364; Price</th>
+				<th>Manage Product</th>
+
+
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="item: ${listItems}">
+				<td th:text="${item.title}">Name</td>
+				<td th:text="${item.category}">Description</td>
+				<td th:text="${item.manufacturer}">Price</td>
+				<td th:text="${item.price}">Price</td>
+				<td>
+					<a class="btn btn-primary mt 4" th:href="@{'/product/update/' + ${item.itemId}}">Purchase Product</a>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
