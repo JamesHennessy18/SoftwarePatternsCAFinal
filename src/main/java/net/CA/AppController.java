@@ -2,7 +2,9 @@ package net.CA;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -68,8 +70,23 @@ public class AppController {
 
 	@PreAuthorize("hasRole('CUSTOMER')")
 	@GetMapping("/home_page")
-	public String homePage(Model model, @Param("keyword") String keyword) {
+	public String homePage(Model model,
+						   @RequestParam(name = "sort", defaultValue = "lowest") String sort,
+						   @RequestParam(name = "category", required = false) String category,
+						   @Param("keyword") String keyword) {
 		List<Item> itemsList = (List<Item>) itemServiceImp.itemsList(keyword);
+		//chain of responsibility Pattern
+		if (category != null) {
+			itemsList = itemsList.stream()
+					.filter(item -> item.getCategory().equalsIgnoreCase(category))
+					.collect(Collectors.toList());
+		}
+		//Strategy Pattern
+		if (sort.equals("lowest")) {
+			itemsList.sort(Comparator.comparing(Item::getPrice));
+		} else if (sort.equals("highest")) {
+			itemsList.sort(Comparator.comparing(Item::getPrice).reversed());
+		}
 		model.addAttribute("listItems", itemsList);
 		return "home_page";
 	}
@@ -119,6 +136,6 @@ public class AppController {
 		itemServiceImp.delete(itemId);
 		return "redirect:/product";
 	}
-	
+
 
 }

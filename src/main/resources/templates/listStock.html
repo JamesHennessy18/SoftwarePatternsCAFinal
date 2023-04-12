@@ -51,8 +51,8 @@
 				<td th:text="${item.manufacturer}">Price</td>
 				<td th:text="${item.price}">Price</td>
 				<td>
-					<a class="btn btn-primary mt 4" th:href="@{'/product/update/' + ${item.itemId}}">Update Listing</a>
-					<a class="btn btn-danger" th:href="@{'/product/delete/' + ${item.itemId}}">Delete Listing</a>
+					<a class="btn btn-primary mt 4" th:href="@{'/product/update/' + ${item.itemId}}">Update stock</a>
+					<a class="btn btn-danger" th:href="@{'/product/delete/' + ${item.itemId}}">Delete stock</a>
 				</td>
 			</tr>
 			</tbody>
