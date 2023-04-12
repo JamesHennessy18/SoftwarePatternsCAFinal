@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 @Controller
 public class AppController {
 
@@ -137,5 +140,71 @@ public class AppController {
 		return "redirect:/product";
 	}
 
+	private Cart getCart(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Cart cart = (Cart) session.getAttribute("cart");
+		if (cart == null) {
+			cart = new Cart();
+			session.setAttribute("cart", cart);
+		}
+		return cart;
+	}
 
+	@PostMapping("/add_to_cart")
+	public String addToCart(@RequestParam("itemId") Long itemId,
+							@RequestParam("quantity") int quantity,
+							HttpServletRequest request,
+							RedirectAttributes redirectAttributes) {
+		Item item = itemRepository.findByItemId(itemId);
+		int availableStock = item.getStock();
+
+		// Get the Cart object from the user's session (or create a new one)
+		HttpSession session = request.getSession();
+		Cart cart = (Cart) session.getAttribute("cart");
+		if (cart == null) {
+			cart = new Cart();
+			session.setAttribute("cart", cart);
+		}
+
+		if (quantity > availableStock) {
+			// If the user tries to add more items than the available stock,
+			// you can show an error message or redirect them to an error page.
+			redirectAttributes.addFlashAttribute("errorMessage", "Cannot add more items than available stock.");
+			return "redirect:/home_page";
+		} else {
+			// Check if the item already exists in the cart
+			CartItem existingCartItem = cart.findItemById(itemId);
+
+			if (existingCartItem != null) {
+				// If the item already exists, update its quantity
+				int newQuantity = existingCartItem.getQuantity() + quantity;
+				if (newQuantity <= availableStock) {
+					existingCartItem.setQuantity(newQuantity);
+				} else {
+					// If the updated quantity exceeds the available stock, show an error message
+					redirectAttributes.addFlashAttribute("errorMessage", "Cannot add more items than available stock.");
+					return "redirect:/home_page";
+				}
+			} else {
+				// If the item doesn't exist in the cart, add it with the requested quantity
+				cart.addItem(item, quantity);
+			}
+		}
+
+		return "redirect:/home_page";
+	}
+
+	@GetMapping("/cart")
+	public String showCart(Model model, HttpServletRequest request) {
+		Cart cart = getCart(request);
+		model.addAttribute("cart", cart);
+		return "cart";
+	}
+
+	@GetMapping("/checkout")
+	public String checkout(Model model, HttpServletRequest request) {
+		Cart cart = getCart(request);
+		model.addAttribute("cart", cart);
+		return "checkout";
+	}
 }

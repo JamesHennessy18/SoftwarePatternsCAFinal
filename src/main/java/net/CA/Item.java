@@ -13,6 +13,9 @@ public class Item {
     @Column(nullable = false)
     private int price;
 
+    @Column(nullable = false)
+    private int stock;
+
     @Column(nullable = false, length = 100)
     private String manufacturer;
     @Column(nullable = false, length = 100)
@@ -72,6 +75,14 @@ public class Item {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 }
 

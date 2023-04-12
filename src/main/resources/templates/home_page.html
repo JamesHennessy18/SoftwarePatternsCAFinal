@@ -12,6 +12,25 @@
         window.location = "[[@{/home_page}]]";
     }
 </script>
+
+	<style>
+		#sidebar {
+z-index: 1000;
+position: absolute;
+width: 20%;
+padding: 10px;
+margin: 0;
+float: left
+}
+
+#mobile-filter ul {
+   padding: 0;
+   margin: 0;
+   color: grey;
+  background-color: transparent;
+  text-decoration: none;
+}
+	</style>
 </head>
 <body>
 <div class="container text-center">
@@ -30,9 +49,10 @@
 			<button class="btn btn-outline-success" type="submit" onclick="clearSearch()">Clear</button>
 		</form>
 	</div>
+</div>
 	<section id="sidebar">
 		<div>
-			<h2 class="p-1 border-bottom">Filter By</h2>
+			<h2 class="p-1 border-bottom">Filter </h2>
 			<h6 class="p-1 border-bottom">Price</h6>
 			<ul class="list-group">
 				<li class="list-group-item list-group-item-action mb-2 rounded">
@@ -58,7 +78,11 @@
 			<button class="btn btn-outline-success" type="submit" style="max-width: 100px; margin: 0 auto" onclick="clearSearch()">Clear</button>
 		</div>
 	</section>
-	<div>
+
+<div class="container text-center">
+	<div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+		<span th:text="${errorMessage}"></span>
+	</div>
 		<table class="table table-striped table-bordered">
 			<thead class="thead-dark">
 			<tr>
@@ -66,6 +90,7 @@
 				<th>category</th>
 				<th>manufacturer</th>
 				<th>&#8364; Price</th>
+				<th>Stock Available</th>
 				<th>Manage Product</th>
 
 
@@ -75,14 +100,22 @@
 			<tr th:each="item: ${listItems}">
 				<td th:text="${item.title}">Name</td>
 				<td th:text="${item.category}">Description</td>
-				<td th:text="${item.manufacturer}">Price</td>
+				<td th:text="${item.manufacturer}">Manufacturer</td>
 				<td th:text="${item.price}">Price</td>
+				<td th:text="${item.stock}"></td>
 				<td>
-					<a class="btn btn-primary mt 4" th:href="@{'/product/update/' + ${item.itemId}}">add to cart</a>
+					<form th:action="@{/add_to_cart}" method="post">
+						<input type="hidden" name="itemId" th:value="${item.itemId}" />
+						<input type="number" name="quantity" min="1" th:max="${item.stock}" value="1" />
+						<button type="submit" class="btn btn-primary mt-4" th:disabled="${item.stock <= 0}">Add to cart</button>
+					</form>
 				</td>
 			</tr>
 			</tbody>
 		</table>
 	</div>
+<div class="container text-center">
+	<a th:href="@{/cart}" class="btn btn-info">View Cart</a>
+</div>
 </body>
 </html>
