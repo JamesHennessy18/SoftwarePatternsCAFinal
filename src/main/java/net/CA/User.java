@@ -25,6 +25,9 @@ public class User {
 	@Column(name = "last_name", nullable = false, length = 20)
 	private String lastName;
 
+	@Column(name = "address", nullable = false, length = 40)
+	private String address;
+
 	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "users_roles",
@@ -93,4 +96,11 @@ public class User {
 		this.roles = roles;
 	}
 
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
 }

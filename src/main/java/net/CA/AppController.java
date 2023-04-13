@@ -13,10 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -36,6 +33,9 @@ public class AppController {
 	private ItemRepository itemRepository;
 	@Autowired
 	private ItemService itemServiceImp;
+
+	@Autowired
+	private OrderRepository orderRepository;
 	
 	@GetMapping("/index")
 	public String viewHomePage() {
@@ -195,16 +195,36 @@ public class AppController {
 	}
 
 	@GetMapping("/cart")
-	public String showCart(Model model, HttpServletRequest request) {
+	public String showCart(Model model, Principal principal, HttpServletRequest request) {
 		Cart cart = getCart(request);
+		User user = userRepo.findByEmail(principal.getName());
 		model.addAttribute("cart", cart);
+		model.addAttribute("user", user);
 		return "cart";
 	}
+	@GetMapping("/order_success")
+	public String showOrderSuccess() {
+		return "order_success";
+	}
 
-	@GetMapping("/checkout")
-	public String checkout(Model model, HttpServletRequest request) {
-		Cart cart = getCart(request);
-		model.addAttribute("cart", cart);
-		return "checkout";
+	@PostMapping("/place_order")
+	public String placeOrder(@ModelAttribute("shippingAddress") String shippingAddress,
+							 HttpServletRequest request,
+							 RedirectAttributes redirectAttributes,
+							 Principal principal) {
+
+		User user = userRepo.findByEmail(principal.getName());
+
+		HttpSession session = request.getSession();
+		Cart cart = (Cart) session.getAttribute("cart");
+
+		String productNames = cart.getItems().stream()
+				.map(cartItem -> cartItem.getItem().getTitle())
+				.collect(Collectors.joining(", "));
+		OrderComplete orderComplete = new OrderComplete(user, productNames, cart.getTotal(), shippingAddress);
+		orderRepository.save(orderComplete);
+		session.removeAttribute("cart");
+		redirectAttributes.addFlashAttribute("orderComplete", orderComplete);
+		return "redirect:/order_success";
 	}
 }

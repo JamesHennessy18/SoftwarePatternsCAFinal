@@ -35,8 +35,34 @@
     </tbody>
 </table>
 <p><strong>Total:</strong> <span th:text="${cart.total}"></span></p>
-<a href="/checkout" class="btn btn-success">Proceed to Checkout</a>
 <a href="/home_page" class="btn btn-primary">Continue Shopping</a>
+
+    <div class="container mt-4">
+        <h2>Payment Details</h2>
+        <form th:action="@{/place_order}" method="post">
+            <div class="form-group">
+                <label for="cardName">Name on Card</label>
+                <input type="text" class="form-control" id="cardName" placeholder="Cardholder's Name" required>
+            </div>
+            <div class="form-group">
+                <label for="cardNumber">Card Number</label>
+                <input type="text" class="form-control" id="cardNumber" placeholder="XXXX XXXX XXXX XXXX" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="expiration">Expiration Date</label>
+                    <input type="text" class="form-control" id="expiration" placeholder="MM/YY" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="cvc">CVC</label>
+                    <input type="text" class="form-control" id="cvc" placeholder="CVC" required>
+                </div>
+            </div>
+                <input type="hidden" name="shippingAddress" th:value="${user.address}">
+
+                <button type="submit" class="btn btn-primary">Place Order</button>
+        </form>
+    </div>
 </div>
 </body>
 </html>
