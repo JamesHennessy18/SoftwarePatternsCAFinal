@@ -2,6 +2,7 @@ package net.CA;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +37,8 @@ public class AppController {
 
 	@Autowired
 	private OrderRepository orderRepository;
-	
+	@Autowired
+	private RatingRepository ratingRepository;
 	@GetMapping("/index")
 	public String viewHomePage() {
 		return "index";
@@ -203,12 +205,20 @@ public class AppController {
 		return "cart";
 	}
 	@GetMapping("/order_success")
-	public String showOrderSuccess() {
+	public String showOrderSuccess(Model model, HttpServletRequest request, Principal principal) {
+		User user = userRepo.findByEmail(principal.getName());
+		model.addAttribute("user", user);
+
+		HttpSession session = request.getSession();
+		@SuppressWarnings("unchecked")
+		List<CartItem> recentCartItems = (List<CartItem>) session.getAttribute("recentCartItems");
+		model.addAttribute("recentCartItems", recentCartItems);
 		return "order_success";
 	}
 
 	@PostMapping("/place_order")
 	public String placeOrder(@ModelAttribute("shippingAddress") String shippingAddress,
+							 @ModelAttribute("order") OrderComplete order,
 							 HttpServletRequest request,
 							 RedirectAttributes redirectAttributes,
 							 Principal principal) {
@@ -218,13 +228,42 @@ public class AppController {
 		HttpSession session = request.getSession();
 		Cart cart = (Cart) session.getAttribute("cart");
 
+		session.setAttribute("recentCartItems", new ArrayList<>(cart.getItems()));
+
 		String productNames = cart.getItems().stream()
 				.map(cartItem -> cartItem.getItem().getTitle())
 				.collect(Collectors.joining(", "));
 		OrderComplete orderComplete = new OrderComplete(user, productNames, cart.getTotal(), shippingAddress);
 		orderRepository.save(orderComplete);
-		session.removeAttribute("cart");
+		for (CartItem cartItem : cart.getItems()) {
+			Item item = cartItem.getItem();
+			int newStock = item.getStock() - cartItem.getQuantity();
+			item.setStock(newStock);
+			itemRepository.save(item);
+		}
+		Cart newCart = new Cart();
+		session.setAttribute("cart", newCart);
 		redirectAttributes.addFlashAttribute("orderComplete", orderComplete);
+		return "redirect:/order_success";
+	}
+
+	@PostMapping("/submit_ratings")
+	public String submitRatings(@RequestParam("userId") Long userId,
+								@RequestParam("itemId") List<Long> itemIds,
+								@RequestParam("rating") List<Integer> ratings,
+								@RequestParam("comment") List<String> comment,
+								RedirectAttributes redirectAttributes) {
+
+		for (int i = 0; i < itemIds.size(); i++) {
+			Rating rating = new Rating();
+			rating.setUserId(userId);
+			rating.setItemId(itemIds.get(i));
+			rating.setRating(ratings.get(i));
+			rating.setComment(comment.get(i));
+			ratingRepository.save(rating);
+		}
+
+		redirectAttributes.addFlashAttribute("ratingSuccessMessage", "Ratings submitted successfully.");
 		return "redirect:/order_success";
 	}
 }
