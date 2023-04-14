@@ -34,9 +34,18 @@
     </tr>
     </tbody>
 </table>
-<p><strong>Total:</strong> <span th:text="${cart.total}"></span></p>
-<a href="/home_page" class="btn btn-primary">Continue Shopping</a>
+    <p><strong>Total:</strong> <span th:text="${cart.total}" id="cartTotal"></span></p>
 
+<a href="/home_page" class="btn btn-primary">Continue Shopping</a>
+    <div class="container mt-4">
+        <h2>Apply Discount</h2>
+        <div class="input-group">
+            <input type="text" class="form-control" id="discountCode" placeholder="Enter discount code">
+            <div class="input-group-append">
+                <button id="applyDiscount" class="btn btn-primary">Apply Discount</button>
+            </div>
+        </div>
+    </div>
     <div class="container mt-4">
         <h2>Payment Details</h2>
         <form th:action="@{/place_order}" method="post">
@@ -59,11 +68,28 @@
                 </div>
             </div>
                 <input type="hidden" name="shippingAddress" th:value="${user.address}">
-
+            <input type="hidden" name="discountCode" id="hiddenDiscountCode">
                 <button type="submit" class="btn btn-primary">Place Order</button>
         </form>
     </div>
 </div>
+<script>
+    document.getElementById("applyDiscount").addEventListener("click", function() {
+        const discountCode = document.getElementById("discountCode").value;
+        if (discountCode === "15OFF") {
+            applyDiscount(0.15, discountCode);
+        } else {
+            alert("Invalid discount code");
+        }
+    });
+
+   function applyDiscount(discount, discountCode) {
+    const originalTotal = parseFloat(document.getElementById("cartTotal").textContent);
+    const newTotal = originalTotal * (1 - discount);
+    document.getElementById("cartTotal").textContent = newTotal.toFixed(2);
+    document.getElementById("hiddenDiscountCode").value = discountCode;
+}
+</script>
 </body>
 </html>
 </body>

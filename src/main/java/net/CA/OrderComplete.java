@@ -23,6 +23,8 @@ import javax.persistence.Table;
 
         @Column(name = "shipping_address", nullable = false)
         private String shippingAddress;
+        public OrderComplete() {
+        }
 
         public OrderComplete(User user, String productNames, Double total, String shippingAddress) {
             this.user = user;

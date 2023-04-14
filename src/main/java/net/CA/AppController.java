@@ -118,7 +118,11 @@ public class AppController {
 	}
 
 	@PostMapping("/product/save")
-	public String itemAdd(Item item) throws IOException {
+	public String itemAdd(Item item, @RequestParam("file") MultipartFile multipartFile) throws IOException {
+		String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+		item.setImage(fileName);
+		String uploadDir = "item-photos/" + item.getItemId();
+		FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
 		itemRepository.save(item);
 		return "redirect:/product";
 	}
@@ -204,24 +208,14 @@ public class AppController {
 		model.addAttribute("user", user);
 		return "cart";
 	}
-	@GetMapping("/order_success")
-	public String showOrderSuccess(Model model, HttpServletRequest request, Principal principal) {
-		User user = userRepo.findByEmail(principal.getName());
-		model.addAttribute("user", user);
-
-		HttpSession session = request.getSession();
-		@SuppressWarnings("unchecked")
-		List<CartItem> recentCartItems = (List<CartItem>) session.getAttribute("recentCartItems");
-		model.addAttribute("recentCartItems", recentCartItems);
-		return "order_success";
-	}
 
 	@PostMapping("/place_order")
 	public String placeOrder(@ModelAttribute("shippingAddress") String shippingAddress,
 							 @ModelAttribute("order") OrderComplete order,
+							 @RequestParam("discountCode") String discountCode,
 							 HttpServletRequest request,
 							 RedirectAttributes redirectAttributes,
-							 Principal principal) {
+							 Principal principal, Model model) {
 
 		User user = userRepo.findByEmail(principal.getName());
 
@@ -233,7 +227,12 @@ public class AppController {
 		String productNames = cart.getItems().stream()
 				.map(cartItem -> cartItem.getItem().getTitle())
 				.collect(Collectors.joining(", "));
-		OrderComplete orderComplete = new OrderComplete(user, productNames, cart.getTotal(), shippingAddress);
+		double total = cart.getTotal();
+
+		if ("15OFF".equals(discountCode)) {
+			total *= 0.85;
+		}
+		OrderComplete orderComplete = new OrderComplete(user, productNames, total, shippingAddress);
 		orderRepository.save(orderComplete);
 		for (CartItem cartItem : cart.getItems()) {
 			Item item = cartItem.getItem();
@@ -243,9 +242,23 @@ public class AppController {
 		}
 		Cart newCart = new Cart();
 		session.setAttribute("cart", newCart);
+		model.addAttribute("orderComplete", orderComplete);
 		redirectAttributes.addFlashAttribute("orderComplete", orderComplete);
 		return "redirect:/order_success";
 	}
+	@GetMapping("/order_success")
+	public String showOrderSuccess(Model model, HttpServletRequest request, Principal principal, @ModelAttribute("orderComplete") OrderComplete orderComplete) {
+		User user = userRepo.findByEmail(principal.getName());
+		model.addAttribute("user", user);
+
+		HttpSession session = request.getSession();
+		@SuppressWarnings("unchecked")
+		List<CartItem> recentCartItems = (List<CartItem>) session.getAttribute("recentCartItems");
+		model.addAttribute("recentCartItems", recentCartItems);
+		model.addAttribute("orderComplete", orderComplete);
+		return "order_success";
+	}
+
 
 	@PostMapping("/submit_ratings")
 	public String submitRatings(@RequestParam("userId") Long userId,
@@ -264,6 +277,22 @@ public class AppController {
 		}
 
 		redirectAttributes.addFlashAttribute("ratingSuccessMessage", "Ratings submitted successfully.");
-		return "redirect:/order_success";
+		return "redirect:/home_page";
+	}
+
+	@GetMapping("/orders")
+	public String listOrders(Model model) {
+		List<OrderComplete> listOrderComplete = orderRepository.findAll();
+		model.addAttribute("listOrderComplete", listOrderComplete);
+
+		return "viewOrders";
+	}
+
+	@GetMapping("/ratings")
+	public String listRatings(Model model) {
+		List<Rating> listRatings = ratingRepository.findAll();
+		model.addAttribute("listRatings", listRatings);
+
+		return "viewRatings";
 	}
 }

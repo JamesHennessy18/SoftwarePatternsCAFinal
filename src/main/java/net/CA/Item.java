@@ -26,7 +26,7 @@ public class Item {
     @Transient
     public String getPhotosImagePath() {
 
-        return "/user-photos/" + "0" + "/" + image;
+        return "/item-photos/" + "0" + "/" + image;
     }
 
     public long getItemId() {

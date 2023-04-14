@@ -11,7 +11,7 @@
 
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Orders</title>
+    <title>Ratings</title>
 </head>
 <body>
 <div class="container text-center">
@@ -31,29 +31,29 @@
             <br>
             <br>
             <br>
-<div>
+            <div>
     <table class="table table-striped table-bordered">
         <thead class="thead-dark">
         <tr>
-            <th>Order Id</th>
-            <th>Product Names</th>
-            <th>&#8364; Price</th>
-            <th>Shipping Address</th>
+            <th>Item Id</th>
+            <th>Rating</th>
+            <th>Comment</th>
+            <th>User Id</th>
 
 
 
         </tr>
         </thead>
         <tbody>
-        <tr th:each="orderComplete: ${listOrderComplete}">
-            <td th:text="${orderComplete.id}"></td>
-            <td th:text="${orderComplete.productNames}"></td>
-            <td th:text="${orderComplete.total}"></td>
-            <td th:text="${orderComplete.shippingAddress}"></td>
+        <tr th:each="rating: ${listRatings}">
+            <td th:text="${rating.itemId}"></td>
+            <td th:text="${rating.rating}"></td>
+            <td th:text="${rating.comment}"></td>
+            <td th:text="${rating.userId}"></td>
         </tr>
         </tbody>
     </table>
-    <h3><a th:href="@{/admin_home}">Go home</a></h3>
+                <h3><a th:href="@{/admin_home}">Go home</a></h3>
 </div>
         </div>
     </div>
