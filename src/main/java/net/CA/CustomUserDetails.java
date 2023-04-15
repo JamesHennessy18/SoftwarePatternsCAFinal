@@ -8,7 +8,7 @@ import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+//Adapter
 public class CustomUserDetails implements UserDetails {
 
 	private User user;

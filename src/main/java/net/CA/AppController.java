@@ -72,7 +72,8 @@ public class AppController {
 		
 		return "users";
 	}
-
+//Annotation based config
+//filter
 	@PreAuthorize("hasRole('CUSTOMER')")
 	@GetMapping("/home_page")
 	public String homePage(Model model,
@@ -80,13 +81,13 @@ public class AppController {
 						   @RequestParam(name = "category", required = false) String category,
 						   @Param("keyword") String keyword) {
 		List<Item> itemsList = (List<Item>) itemServiceImp.itemsList(keyword);
-		//chain of responsibility Pattern
+
 		if (category != null) {
 			itemsList = itemsList.stream()
 					.filter(item -> item.getCategory().equalsIgnoreCase(category))
 					.collect(Collectors.toList());
 		}
-		//Strategy Pattern
+
 		if (sort.equals("lowest")) {
 			itemsList.sort(Comparator.comparing(Item::getPrice));
 		} else if (sort.equals("highest")) {
